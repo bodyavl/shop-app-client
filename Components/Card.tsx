@@ -5,9 +5,10 @@ import { BlurView } from "expo-blur";
 interface ICardProps {
   title: string;
   imgSrc: string;
+  price: number;
   onPress?: () => void;
 }
-const Card: React.FC<ICardProps> = ({ title, imgSrc, onPress }) => {
+const Card: React.FC<ICardProps> = ({ title, price, imgSrc, onPress }) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <View style={styles.innerContainer}>
@@ -19,6 +20,7 @@ const Card: React.FC<ICardProps> = ({ title, imgSrc, onPress }) => {
             style={styles.poster}
           />
           <Text style={styles.title}>{title}</Text>
+          <Text style={styles.price}>{price}$</Text>
         </BlurView>
       </View>
     </TouchableOpacity>
@@ -50,7 +52,13 @@ const styles = StyleSheet.create({
   title: {
     color: "#fff",
     fontSize: 16,
-    marginLeft: 10,
+    marginLeft: 3,
+    fontWeight: "400",
+  },
+  price: {
+    color: "#fff",
+    fontSize: 18,
+    marginLeft: 3,
     fontWeight: "600",
   },
   poster: {

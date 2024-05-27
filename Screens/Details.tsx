@@ -11,33 +11,34 @@ import {
 import React, { useCallback } from "react";
 import { DetailsProps } from "../types";
 import { useFocusEffect } from "@react-navigation/native";
-import { getMovieDetails } from "../services";
+import { getProductDetails } from "../services/products/getProductDetails";
 import { IMovie } from "../interfaces";
 import { DetailsAbout } from "../Components/UI";
+import { IProduct } from "../services/products/types";
 const bgImage = require("../assets/Background.png");
 
 export interface IDetailsProps {
-  id: string;
+  id: number;
   title: string;
 }
 
 const Details = ({ route, navigation }: DetailsProps) => {
   const { id, title } = route.params;
-  navigation.setOptions({ title });
 
-  const [movie, setMovie] = React.useState<IMovie>();
+  const [product, setProduct] = React.useState<IProduct>();
 
   useFocusEffect(
     useCallback(() => {
       async function getMovie() {
         try {
-          const res = await getMovieDetails(id);
-          setMovie(res);
+          const res = await getProductDetails(+id);
+          setProduct(res);
         } catch (error) {
           alert(error);
         }
       }
 
+      navigation.setOptions({ title });
       getMovie();
     }, [id])
   );
@@ -52,26 +53,12 @@ const Details = ({ route, navigation }: DetailsProps) => {
         <ScrollView contentContainerStyle={styles.innerContainer}>
           <Image
             source={{
-              uri: movie?.poster,
+              uri: product?.photo?.path,
             }}
-            style={styles.poster}
+            style={styles.photo}
           />
-          <Text style={styles.title}>{movie?.title}</Text>
-          <Text style={styles.descr}>{movie?.description}</Text>
-          <Text style={styles.genres}>
-            Genres:{" "}
-            {movie?.genres.map((genre, i) =>
-              i === movie.genres.length - 1 ? genre.name : `${genre.name}, `
-            )}
-          </Text>
-          <DetailsAbout>{movie?.type && `Type: ${movie.type}`}</DetailsAbout>
-          <DetailsAbout>Rating: {movie?.rating.toFixed(2)}</DetailsAbout>
-          <DetailsAbout>
-            {movie?.runtime && `Runtime: ${movie?.runtime} minutes`}
-          </DetailsAbout>
-          <DetailsAbout>
-            {movie?.date && `Date: ${new Date(movie.date).toDateString()}`}
-          </DetailsAbout>
+          <Text style={styles.name}>{product?.name}</Text>
+          <Text style={styles.descr}>{product?.description}</Text>
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
@@ -95,7 +82,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     gap: 20,
   },
-  title: {
+  name: {
     fontSize: 24,
     fontWeight: "600",
     color: "#fff",
@@ -110,7 +97,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 
-  poster: {
+  photo: {
     borderRadius: 12,
     width: "100%",
     height: 550,

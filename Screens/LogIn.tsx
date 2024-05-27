@@ -1,19 +1,17 @@
 import { ImageBackground, SafeAreaView, StyleSheet } from "react-native";
 import Header from "../Components/Header";
 import MainContainer from "../Components/MainContainer";
-import { HomeProps } from "../types";
+import { HomeProps, LoginProps } from "../types";
 const bgImage = require("../assets/Background.png");
 
-export default function Home({ navigation }: HomeProps) {
+export default function LogIn({ navigation }: LoginProps) {
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
         source={bgImage}
         resizeMode="cover"
         style={styles.background}
-      >
-        <MainContainer navigation={navigation} />
-      </ImageBackground>
+      ></ImageBackground>
     </SafeAreaView>
   );
 }

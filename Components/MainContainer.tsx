@@ -5,31 +5,61 @@ import {
   Text,
   View,
 } from "react-native";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Card from "./Card";
-import { getMovies } from "../services";
+import { getProducts } from "../services/products/getProducts";
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
+import { IProduct } from "../services/products/types";
+import { isAxiosError } from "axios";
+import { Pagination } from "../interfaces";
+import { HomeTabsParamList } from "../Navigation/HomeTabs";
+import { RootStackParamList } from "../Navigation/RootStack";
+import {
+  BottomTabNavigationProp,
+  BottomTabScreenProps,
+} from "@react-navigation/bottom-tabs";
 import { HomeProps } from "../types";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../App";
+import {
+  CompositeNavigationProp,
+  CompositeScreenProps,
+} from "@react-navigation/native";
 
 interface IMainContainerProps {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Home", undefined>;
+  navigation: CompositeNavigationProp<
+    BottomTabNavigationProp<HomeTabsParamList, "Home">,
+    NativeStackNavigationProp<RootStackParamList>
+  >;
 }
 
 const MainContainer = ({ navigation }: IMainContainerProps) => {
-  const [movies, setMovies] = useState<[]>();
+  const [products, setProducts] = useState<Pagination<IProduct>>();
   const [refreshing, setRefreshing] = useState(false);
 
-  async function getMoviesFromApi() {
-    const data = await getMovies();
-    setMovies(data);
+  async function getProductsFromApi() {
+    const data = await getProducts();
+    setProducts(data);
   }
 
+  useEffect(() => {
+    if (!products) {
+      getProductsFromApi();
+    }
+  });
+
   const onRefresh = useCallback(async () => {
-    setMovies([]);
-    setRefreshing(true);
-    await getMoviesFromApi();
-    setRefreshing(false);
+    try {
+      setProducts(undefined);
+      setRefreshing(true);
+      await getProductsFromApi();
+      setRefreshing(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        alert(error.response?.data.message);
+      }
+    }
   }, []);
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -39,23 +69,24 @@ const MainContainer = ({ navigation }: IMainContainerProps) => {
         onRefresh={onRefresh}
       />
       <View style={styles.cards}>
-        {!movies && (
+        {!products && (
           <Text style={styles.loading}>
-            Refresh page to discover new movies
+            No products found. Pull down to refresh
           </Text>
         )}
         {refreshing && <Text style={styles.loading}>Loading...</Text>}
 
-        {movies?.map((movie: any, index: number) => {
+        {products?.data?.map((product: IProduct, index: number) => {
           return (
             <Card
               key={index}
-              title={movie.title}
-              imgSrc={movie.poster}
+              title={product.name}
+              imgSrc={product.photo.path}
+              price={product.price}
               onPress={() =>
                 navigation.navigate("Details", {
-                  id: movie._id,
-                  title: movie.title,
+                  id: product.id,
+                  title: product.name,
                 })
               }
             />
@@ -71,7 +102,7 @@ export default MainContainer;
 const styles = StyleSheet.create({
   container: {
     height: "auto",
-    padding: 20,
+    padding: 10,
     alignItems: "flex-start",
     justifyContent: "flex-start",
   },
@@ -88,6 +119,7 @@ const styles = StyleSheet.create({
   cards: {
     flex: 1,
     rowGap: 10,
+    columnGap: 5,
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "flex-start",

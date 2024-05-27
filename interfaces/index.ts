@@ -11,3 +11,9 @@ export interface IMovie {
   title: string;
   type: string;
 }
+
+export interface Pagination<T> {
+  data: T[];
+  hasNextPage: boolean;
+  maximumPages?: number;
+}
