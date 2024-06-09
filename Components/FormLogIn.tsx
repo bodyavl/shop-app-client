@@ -1,15 +1,21 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, StyleSheet } from "react-native";
 import Input from "./UI/Input";
+import { useAuth } from "../context/AuthContext";
+
+interface IFormLogInProps {
+  navigator: any;
+}
 
 const FormLogIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const { onLogin } = useAuth();
+
+  const handleLogin = async () => {
     // Implement your login logic here
-    console.log("Email:", email);
-    console.log("Password:", password);
+    await onLogin(email, password);
   };
 
   return (
@@ -32,14 +38,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
-  },
-  input: {
-    width: "100%",
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
   },
 });
 

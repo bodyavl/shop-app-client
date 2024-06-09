@@ -6,14 +6,22 @@ interface InputProps extends TextInputProps {
 }
 
 const Input: React.FC<InputProps> = (props) => {
-  return <TextInput {...props} style={styles.input} />;
+  return (
+    <TextInput
+      {...props}
+      placeholderTextColor="rgba(255, 255, 255, 0.3)"
+      style={styles.input}
+    />
+  );
 };
 
 const styles = StyleSheet.create({
   input: {
     width: "100%",
     height: 40,
-    borderColor: "gray",
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: 5,
+    color: "white",
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,

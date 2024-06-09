@@ -3,9 +3,10 @@ import Header from "../Components/Header";
 import MainContainer from "../Components/MainContainer";
 import { HomeProps, LoginProps } from "../types";
 import FormLogIn from "../Components/FormLogIn";
+import ProfileContainer from "../Components/ProfileContainer";
 const bgImage = require("../assets/Background.png");
 
-export default function LogIn() {
+export default function Profile() {
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
@@ -13,7 +14,7 @@ export default function LogIn() {
         resizeMode="cover"
         style={styles.background}
       >
-        <FormLogIn />
+        <ProfileContainer />
       </ImageBackground>
     </SafeAreaView>
   );

@@ -13,37 +13,33 @@ import { DetailsProps } from "../types";
 import { useFocusEffect } from "@react-navigation/native";
 import { getProductDetails } from "../services/products/getProductDetails";
 import { IProduct } from "../services/products/types";
-import { addToCart } from "../services/products/addToCart";
+import { getProducts } from "../services/products/getProducts";
+import CartContainer from "../Components/CartContainer";
+import { getMe } from "../services/auth/getMe";
+import { removeFromCart } from "../services/products/removeFromCart";
 const bgImage = require("../assets/Background.png");
 
-export interface IDetailsProps {
-  id: number;
-  title: string;
-}
+const Cart = () => {
+  const [products, setProducts] = React.useState<IProduct[]>([]);
 
-const Details = ({ route, navigation }: DetailsProps) => {
-  const { id, title } = route.params;
-
-  const [product, setProduct] = React.useState<IProduct>();
+  async function getCart() {
+    try {
+      const res = await getMe();
+      setProducts(res.cart);
+    } catch (error) {
+      alert(error);
+    }
+  }
 
   useFocusEffect(
     useCallback(() => {
-      async function getMovie() {
-        try {
-          const res = await getProductDetails(+id);
-          setProduct(res);
-        } catch (error) {
-          alert(error);
-        }
-      }
-
-      navigation.setOptions({ title });
-      getMovie();
-    }, [id])
+      getCart();
+    }, [])
   );
 
-  const handleAddToCart = async (id: number) => {
-    await addToCart(id);
+  const handleCartRemove = async (id: number) => {
+    await removeFromCart(id);
+    await getCart();
   };
 
   return (
@@ -54,25 +50,14 @@ const Details = ({ route, navigation }: DetailsProps) => {
         style={styles.background}
       >
         <ScrollView contentContainerStyle={styles.innerContainer}>
-          <Image
-            source={{
-              uri: product?.photo?.path,
-            }}
-            style={styles.photo}
-          />
-          <Text style={styles.name}>{product?.name}</Text>
-          <Text style={styles.descr}>{product?.description}</Text>
+          <CartContainer cart={products} onRemove={handleCartRemove} />
         </ScrollView>
-        <Button
-          title="Add to cart"
-          onPress={product?.id ? () => handleAddToCart(product.id) : () => {}}
-        />
       </ImageBackground>
     </SafeAreaView>
   );
 };
 
-export default Details;
+export default Cart;
 
 const styles = StyleSheet.create({
   background: {

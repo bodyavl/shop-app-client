@@ -12,7 +12,12 @@ const Stack = createNativeStackNavigator<LoginStackParamList>();
 
 const LoginStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerTransparent: true,
+        headerTitleStyle: { color: "#fff" },
+      }}
+    >
       <Stack.Screen name="Login" component={LogIn} />
     </Stack.Navigator>
   );

@@ -1,13 +1,19 @@
 import { StyleSheet } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import React from "react";
-import RootStack from "./Navigation/RootStack";
+import React, { useEffect } from "react";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import NavContainer from "./Navigation/NavContainer";
 
 export default function App() {
+  const { authState } = useAuth();
+
+  useEffect(() => {
+    console.log(authState);
+  }, [authState]);
+
   return (
-    <NavigationContainer>
-      <RootStack />
-    </NavigationContainer>
+    <AuthProvider>
+      <NavContainer />
+    </AuthProvider>
   );
 }
 

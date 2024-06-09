@@ -16,6 +16,7 @@ const RootStack = () => {
   return (
     <Stack.Navigator
       screenOptions={{
+        headerBackTitleVisible: false,
         headerTransparent: true,
         headerTitleStyle: { color: "#fff" },
       }}
@@ -23,7 +24,7 @@ const RootStack = () => {
       <Stack.Screen
         name="HomeTabs"
         component={HomeTabs}
-        options={{ headerTitle: "Home" }}
+        options={{ headerBackTitleVisible: false, headerTitle: "" }}
       />
       <Stack.Screen name="Details" component={Details} />
     </Stack.Navigator>

@@ -1,4 +1,10 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { signIn } from "../services/auth/signIn";
+import { IUser } from "../interfaces";
+import getUser from "../utils/getUser";
+import setUser from "../utils/setUser";
+import setAccessToken from "../utils/setAccessToken";
+import setRefreshToken from "../utils/setRefreshToken";
 
 export enum Role {
   ADMIN = "admin",
@@ -8,14 +14,18 @@ export enum Role {
 interface AuthProps {
   authState: {
     authenticated: boolean | null;
-    username: string | null;
-    role: Role | null;
+    user: IUser | null;
+    token?: string | null;
   };
   onLogin: (username: string, password: string) => void;
   onLogout: () => void;
 }
 
-const AuthContext = createContext<Partial<AuthProps>>({});
+const AuthContext = createContext<AuthProps>({
+  authState: { authenticated: false, user: null },
+  onLogin: () => {},
+  onLogout: () => {},
+});
 
 export const useAuth = () => {
   return useContext(AuthContext);
@@ -24,37 +34,55 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: any) => {
   const [authState, setAuthState] = useState<{
     authenticated: boolean | null;
-    username: string | null;
-    role: Role | null;
+    user: IUser | null;
+    token?: string | null;
   }>({
     authenticated: null,
-    username: null,
-    role: null,
+    user: null,
+    token: null,
   });
 
-  const login = (username: string, password: string) => {
-    if (username === "admin" && password === "admin") {
+  useEffect(() => {
+    async function getUserData() {
+      const user = await getUser();
+      console.log(user);
+
+      if (user) {
+        setAuthState({
+          authenticated: true,
+          user,
+        });
+      } else {
+        setAuthState({
+          authenticated: false,
+          user: null,
+        });
+      }
+    }
+    getUserData();
+  }, []);
+
+  const login = async (username: string, password: string) => {
+    try {
+      const res = await signIn(username, password);
+
       setAuthState({
         authenticated: true,
-        username: username,
-        role: Role.ADMIN,
+        user: res.user,
       });
-    } else if (username === "user" && password === "user") {
-      setAuthState({
-        authenticated: true,
-        username: username,
-        role: Role.USER,
-      });
-    } else {
-      alert("Invalid username or password!");
+
+      await setUser(res.user);
+      await setAccessToken(res.token);
+      await setRefreshToken(res.refreshToken);
+    } catch (error) {
+      alert("Wrong username or password!");
     }
   };
 
   const logout = async () => {
     setAuthState({
       authenticated: false,
-      username: null,
-      role: null,
+      user: null,
     });
   };
 

@@ -1,7 +1,8 @@
-import axios from "axios";
+import ApiClient from "..";
+import { AuthResponse } from "./types";
 
 export async function signUp(email: string, password: string) {
-  const res = await axios.post(`${process.env.API_URL}/auth/email/register`, {
+  const res = await ApiClient.post<AuthResponse>(`/auth/email/register`, {
     email,
     password,
   });
